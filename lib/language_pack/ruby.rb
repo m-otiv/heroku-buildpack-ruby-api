@@ -113,7 +113,6 @@ WARNING
         post_bundler
         create_database_yml
         install_binaries
-        run_assets_precompile_rake_task
       end
       config_detect
       best_practice_warnings
@@ -168,7 +167,6 @@ WARNING
       create_database_yml
       # TODO replace this with multibuildpack stuff? put binaries in their own layer?
       install_binaries
-      run_assets_precompile_rake_task
     end
     setup_profiled(ruby_layer_path: ruby_layer.path, gem_layer_path: gem_layer.path)
     setup_export(gem_layer)
@@ -1209,22 +1207,6 @@ params = CGI.parse(uri.query || "")
 
   def yarn_not_preinstalled?
     !yarn_preinstalled?
-  end
-
-  def run_assets_precompile_rake_task
-    instrument 'ruby.run_assets_precompile_rake_task' do
-
-      precompile = rake.task("assets:precompile")
-      return true unless precompile.is_defined?
-
-      topic "Precompiling assets"
-      precompile.invoke(env: rake_env)
-      if precompile.success?
-        puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
-      else
-        precompile_fail(precompile.output)
-      end
-    end
   end
 
   def precompile_fail(output)
